@@ -1,47 +1,75 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { computed, reactive, ref } from 'vue'
+import { battleModes, challenges, games, type BattleMode, type Challenge, type Game } from './data'
+
+const points = reactive({
+  a: 0,
+  b: 0,
+})
+
+const battleMode = ref<BattleMode>()
+const challenge = ref<Challenge>()
+const game = ref<Game>()
+
+const selections = reactive([
+  {
+    title: 'Battle Mode',
+    ref: battleMode,
+    options: battleModes,
+  },
+  {
+    title: 'Challenge',
+    ref: challenge,
+    options: challenges,
+  },
+  {
+    title: 'Game',
+    ref: game,
+    options: computed(() =>
+      games.filter(
+        (g) =>
+          (battleMode.value?.games?.includes(g.name) ?? true) &&
+          (challenge.value?.games?.includes(g.name) ?? true),
+      ),
+    ),
+  },
+])
+
+const selectionIndex = ref(0)
+
+const selection = computed(() => selections[selectionIndex.value])
+const canChooseWinner = computed(() => battleMode.value && challenge.value && game.value)
+
+const draw = () => {
+  const sel = selection.value
+  sel.ref = sel.options[Math.floor(Math.random() * sel.options.length)] as any
+  const newIndex = (selectionIndex.value + 1) % selections.length
+  selectionIndex.value = newIndex
+}
+
+const chooseWinner = (team: keyof typeof points) => {
+  points[team] += battleMode.value?.points ?? 0
+  battleMode.value = undefined
+  challenge.value = undefined
+  game.value = undefined
+  selectionIndex.value = 0
+}
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="HOLA!" fafa="YA TENGO GITHUB"/>
+  <div>
+    <ul>
+      <li v-for="point in Object.entries(points)" :key="point[0]">
+        {{ point[0] }}: {{ point[1] }}
+      </li>
+    </ul>
+    <ul>
+      <li v-for="sel in selections" :key="sel.title">{{ sel.title }}: {{ sel.ref?.title }}</li>
+    </ul>
+    <div v-if="canChooseWinner">
+      <button type="button" @click="chooseWinner('a')">A wins</button>
+      <button type="button" @click="chooseWinner('b')">B wins</button>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <button v-else type="button" @click="draw">Draw {{ selection.title.toLowerCase() }}</button>
+  </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
