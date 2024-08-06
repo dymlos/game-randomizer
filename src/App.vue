@@ -13,16 +13,19 @@ const game = ref<Game>()
 
 const selections = reactive([
   {
+    name: 'battle-mode' as const,
     title: 'Battle Mode',
     ref: battleMode,
     options: battleModes,
   },
   {
+    name: 'challenge' as const,
     title: 'Challenge',
     ref: challenge,
     options: challenges,
   },
   {
+    name: 'game' as const,
     title: 'Game',
     ref: game,
     options: computed(() =>
@@ -64,7 +67,10 @@ const chooseWinner = (team: keyof typeof points) => {
       </li>
     </ul>
     <ul>
-      <li v-for="sel in selections" :key="sel.title">{{ sel.title }}: {{ sel.ref?.title }}</li>
+      <li v-for="sel in selections" :key="sel.title">
+        {{ sel.title }}: {{ sel.ref?.title }}
+        <span v-if="sel.name === 'battle-mode' && sel.ref">(points: {{ sel.ref.points }})</span>
+      </li>
     </ul>
     <div v-if="canChooseWinner">
       <button type="button" @click="chooseWinner('a')">A wins</button>
