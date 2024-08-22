@@ -2,6 +2,7 @@
 import { computed, reactive, ref } from 'vue'
 import { battleModes, challenges, games, type BattleMode, type Challenge, type Game } from './data'
 import GameCard from './components/GameCard.vue'
+import ChallengeExtra from './components/ChallengeExtra.vue'
 
 const points = reactive({
   blue: 0,
@@ -15,7 +16,11 @@ const chosenCards = reactive({
 })
 
 const decks = reactive({
-  battleMode: computed(() => battleModes),
+  battleMode: computed(() =>
+    battleModes.filter(
+      (bm: BattleMode) => (chosenCards.game && bm.games?.includes(chosenCards.game.name)) ?? true,
+    ),
+  ),
   game: computed(() =>
     games.filter(
       (g) =>
@@ -23,7 +28,11 @@ const decks = reactive({
         (chosenCards.challenge?.games?.includes(g.name) ?? true),
     ),
   ),
-  challenge: computed(() => challenges),
+  challenge: computed(() =>
+    challenges.filter(
+      (c: Challenge) => (chosenCards.game && c.games?.includes(chosenCards.game.name)) ?? true,
+    ),
+  ),
 })
 
 const winnerChosen = ref(false)
@@ -95,7 +104,13 @@ const chooseWinner = (team: keyof typeof points) => {
           <div>Puntos: {{ chosenCards.battleMode?.points }}</div>
         </GameCard>
         <GameCard :typeTitle="'Juego'" :data="chosenCards.game" @click="draw('game')" />
-        <GameCard :typeTitle="'Desafío'" :data="chosenCards.challenge" @click="draw('challenge')" />
+        <GameCard :typeTitle="'Desafío'" :data="chosenCards.challenge" @click="draw('challenge')">
+          <ChallengeExtra
+            v-if="chosenCards.challenge"
+            :challenge="chosenCards.challenge"
+            :game="chosenCards.game"
+          />
+        </GameCard>
       </li>
     </ul>
   </main>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BattleMode, Challenge, Game } from '../data'
+import type { BattleMode, Challenge, Game } from '@/data'
 
 defineProps<{
   typeTitle: string

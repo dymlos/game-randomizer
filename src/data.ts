@@ -20,8 +20,8 @@ export const games = [
     title: 'Rivals of Aether',
   },
   {
-    name: 'wamba-warrior',
-    title: 'Wamba Warrior',
+    name: 'wanba-warrior',
+    title: 'Wanba Warrior',
   },
   {
     name: 'bopl-battle',
@@ -39,8 +39,17 @@ export const battleModes = [
     name: 'the-champion',
     title: 'The Champion',
     description:
-      'Es un 1 vs 1. Se manda un campeón por equipo. No se puede repetir el mismo champion consecutivamente si vuelve a tocar este mismo modo (El mismo campeón no puede volver a ir hasta que todos hayan pasado).',
+      'Es un 1 vs 1. Se manda un campeón por equipo. No se puede repetir el mismo champion consecutivamente si vuelve a tocar este mismo modo (el mismo campeón o survivor no puede volver a ir hasta que todos hayan pasado).',
     points: 5,
+    games: [
+      'boomerang-fu',
+      'mystic-strife',
+      'shipped',
+      'spider-heck',
+      'rivals-of-aether',
+      'wanba-warrior',
+      'bopl-battle',
+    ],
   },
   {
     name: 'team-vs-team',
@@ -48,22 +57,14 @@ export const battleModes = [
     description:
       'Todos los jugadores de cada equipo participan. Si el juego no tiene la posibilidad de jugar en equipo, se hará un todos contra todos pero intentando jugar a favor de tu equipo.',
     points: 10,
-    games: ['boomerang-fu', 'mystic-strife', 'shipped'],
+    games: ['boomerang-fu', 'mystic-strife', 'rivals-of-aether', 'bopl-battle'],
   },
   {
-    name: 'secret-mission',
-    title: 'Secret Mission',
+    name: 'survival',
+    title: 'Survival',
     description:
-      'Todos los jugadores de cada equipo participan. Si el juego no tiene la posibilidad de jugar en equipo, se hará un todos contra todos pero intentando jugar a favor de tu equipo. Se sorteará una misión de asesinato a cada equipo. Esta misión es secreta. Solo la puede saber cada equipo. Por ejemplo si al equipo A le sale “Matar a Fede” y al equipo B le sale “Matar a Agus” ganará el equipo que primero logre ese asesinato.',
-    points: 15,
-    games: ['boomerang-fu', 'mystic-strife', 'shipped'],
-  },
-  {
-    name: 'one-against-the-world',
-    title: 'One Against The World',
-    description:
-      'Cada equipo mandará a sus integrantes para enfrentar a todo el equipo rival. Por ejemplo: Si hay dos equipos de tres (equipo A y equipo B) sería así:\nEl primero designado del equipo A se enfrentará a todo el equipo B al mismo tiempo. Luego el primer designado del equipo B se enfrentará a todo el equipo A. Luego lo mismo con el segundo designado de cada equipo y finalmente lo mismo con el tercer designado de cada equipo.\nCada vez que un integrante que juega solo logra una kill. Ganará el equipo que logre más kills de sus integrantes.',
-    points: 20,
+      'Cada equipo mandará a uno de sus integrantes para enfrentar a todo el equipo rival',
+    points: 10,
   },
 ] as const satisfies {
   name: string
@@ -79,19 +80,14 @@ export const challenges = [
   {
     name: 'unique-item',
     title: 'Unique Item',
-    description: 'Se sorteará un ítem para que aparezca en el mapa.',
-    games: ['boomerang-fu', 'spider-heck', 'bopl-battle'],
-  },
-  {
-    name: 'double-win',
-    title: 'Double Win',
-    description:
-      'Se jugará un mismo juego las veces que sean necesarias hasta que un equipo logre dos victorias consecutivas.',
+    description: 'Se sortearán las habilidades o items que se podrán usar en el juego',
+    games: ['boomerang-fu', 'bopl-battle'],
   },
   {
     name: 'good-luck-with-that',
     title: 'Good Luck With That',
-    description: 'Se deberá jugar con personajes o skills de forma aleatoria.',
+    description: 'Se deberá jugar con personajes o skills de forma aleatoria',
+    games: ['mystic-strife', 'rivals-of-aether', 'wanba-warrior', 'bopl-battle'],
   },
   {
     name: 'one-hand-mastery',
@@ -99,28 +95,29 @@ export const challenges = [
     description: 'Se jugará con una sola mano en el joystick',
   },
   {
-    name: 'basic-instinct',
-    title: 'Basic Instinct',
-    description:
-      'Se deberá jugar sin items ni habilidades especiales. Se deberá tratar de llevar al juego a su mínima ofensiva. Es decir, lo más básico que tenga el juego para derrotar al otro o ganarlo. (Por ejemplo en el Shipped no se deberá usar el cañon, en el Rival of Aether no se usarán los ataques especiales y así con cada juego)',
-  },
-  {
     name: 'mirror-war',
     title: 'Mirror War',
-    description: 'Todos jugarán con el mismo personaje.',
+    description: 'Todos jugarán con el mismo personaje',
+    games: ['mystic-strife', 'rivals-of-aether', 'wanba-warrior'],
   },
   {
     name: 'sudden-death',
     title: 'Sudden Death',
     description:
-      'Cada personaje tendrá la vida al máximo de daño desde el inicio. Por ende, al primer golpe podrían morir.',
+      'Cada personaje tendrá la vida al máximo de daño desde el inicio. Por ende, al primer golpe podrían morir',
+    games: ['rivals-of-aether'],
   },
   {
     name: 'wrong-direction',
     title: 'Wrong Direction',
     description: 'Se jugará con las flechitas del joystick invertidas',
   },
-] as const satisfies { name: string; title: string; description: string; games?: Game['name'][] }[]
+] as const satisfies {
+  name: string
+  title: string
+  description: string
+  games?: Game['name'][]
+}[]
 
 export type Challenge = (typeof challenges)[number] & { games?: Game['name'][] }
 
@@ -169,3 +166,81 @@ export const powerUps = [
 ] as const satisfies { name: string; title: string; description: string }[]
 
 export type PowerUp = (typeof powerUps)[number]
+
+export const boomerangFuItems = [
+  'Caffeinated',
+  'Dash Through Walls',
+  'Teleport Boomerang',
+  'Explosive Boomerang',
+  'Multi Boomerang',
+  'Fire Boomerang',
+  'Ice Boomerang',
+  'Disguise',
+  'Shield',
+  'Battle Royale',
+  'Telekinesis Boomerang',
+  'Bamboozled',
+  'Extra Boomerang',
+  'Decoy',
+]
+
+export const boplBattleItems = [
+  'Dash',
+  'Grenade',
+  'Bow',
+  'Engine',
+  'Blink Gun',
+  'Gust',
+  'Growth Ray',
+  'Rock',
+  'Missile',
+  'Spike',
+  'Time Stop',
+  'Smoke',
+  'Platform',
+  'Revival',
+  'Roll',
+  'Shrink Ray',
+  'Black Hole',
+  'Invisibility',
+  'Meteor',
+  'Throw',
+  'Push',
+  'Tesla Coil',
+  'Mine',
+  'Teleport',
+  'Drill',
+  'Grappling Hook',
+  'Beam',
+  'Duplicator',
+]
+
+export const rivalsOfAetherCharacters = [
+  'Zetterburn',
+  'Orcane',
+  'Wrastor',
+  'Kragg',
+  'Forsburn',
+  'Maypul',
+  'Absa',
+  'Etalus',
+  'Ranno',
+  'Clairen',
+  'Sylvanos',
+  'Elliana',
+  'Ori and Sein',
+  'Shovel Knight',
+  'Mollo',
+  'Hodan',
+  'Pomme',
+  'Olympia',
+]
+
+export const mysticStrifeCharacters = [
+  'Ranger',
+  'Wizard',
+  'Necromancer',
+  'Rogue',
+  'Engineer',
+  'Dragoon',
+]
