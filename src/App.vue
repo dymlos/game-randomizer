@@ -1,81 +1,116 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { battleModes, challenges, games, type BattleMode, type Challenge, type Game } from './data'
+import GameCard from './components/GameCard.vue'
 
 const points = reactive({
-  a: 0,
-  b: 0,
+  blue: 0,
+  red: 0,
 })
 
-const battleMode = ref<BattleMode>()
-const challenge = ref<Challenge>()
-const game = ref<Game>()
+const chosenCards = reactive({
+  battleMode: ref<BattleMode>(),
+  game: ref<Game>(),
+  challenge: ref<Challenge>(),
+})
 
-const selections = reactive([
-  {
-    name: 'battle-mode' as const,
-    title: 'Battle Mode',
-    ref: battleMode,
-    options: battleModes,
-  },
-  {
-    name: 'challenge' as const,
-    title: 'Challenge',
-    ref: challenge,
-    options: challenges,
-  },
-  {
-    name: 'game' as const,
-    title: 'Game',
-    ref: game,
-    options: computed(() =>
-      games.filter(
-        (g) =>
-          (battleMode.value?.games?.includes(g.name) ?? true) &&
-          (challenge.value?.games?.includes(g.name) ?? true),
-      ),
+const decks = reactive({
+  battleMode: computed(() => battleModes),
+  game: computed(() =>
+    games.filter(
+      (g) =>
+        (chosenCards.battleMode?.games?.includes(g.name) ?? true) &&
+        (chosenCards.challenge?.games?.includes(g.name) ?? true),
     ),
-  },
-])
+  ),
+  challenge: computed(() => challenges),
+})
 
-const selectionIndex = ref(0)
+const winnerChosen = ref(false)
+const canChooseWinner = computed(() =>
+  Boolean(
+    chosenCards.battleMode && chosenCards.challenge && chosenCards.game && !winnerChosen.value,
+  ),
+)
 
-const selection = computed(() => selections[selectionIndex.value])
-const canChooseWinner = computed(() => battleMode.value && challenge.value && game.value)
+const draw = (deck: keyof typeof decks) => {
+  const cards = decks[deck]
+  const randomIndex = Math.floor(Math.random() * cards.length)
+  chosenCards[deck] = cards[randomIndex] as any
+}
 
-const draw = () => {
-  const sel = selection.value
-  sel.ref = sel.options[Math.floor(Math.random() * sel.options.length)] as any
-  const newIndex = (selectionIndex.value + 1) % selections.length
-  selectionIndex.value = newIndex
+const redraw = () => {
+  chosenCards.battleMode = undefined
+  chosenCards.game = undefined
+  chosenCards.challenge = undefined
+  winnerChosen.value = false
 }
 
 const chooseWinner = (team: keyof typeof points) => {
-  points[team] += battleMode.value?.points ?? 0
-  battleMode.value = undefined
-  challenge.value = undefined
-  game.value = undefined
-  selectionIndex.value = 0
+  points[team] += chosenCards.battleMode?.points ?? 0
+  winnerChosen.value = true
 }
 </script>
 
 <template>
-  <div>
+  <main class="flex flex-col gap-4 m-4 items-center">
+    <section class="flex gap-4">
+      <section class="flex gap-2">
+        <input type="number" v-model="points.blue" class="text-blue-600" :class="$style.input" />
+        <button
+          type="button"
+          :disabled="!canChooseWinner"
+          @click="chooseWinner('blue')"
+          class="bg-blue-600"
+          :class="$style.btn"
+        >
+          +
+        </button>
+      </section>
+      <div>
+        <button type="button" @click="redraw" class="bg-stone-400" :class="$style.btn">
+          Mezclar nuevamente
+        </button>
+      </div>
+      <section class="flex gap-2">
+        <button
+          type="button"
+          :disabled="!canChooseWinner"
+          @click="chooseWinner('red')"
+          class="bg-red-600"
+          :class="$style.btn"
+        >
+          +
+        </button>
+        <input type="number" v-model="points.red" class="text-red-600" :class="$style.input" />
+      </section>
+    </section>
     <ul>
-      <li v-for="point in Object.entries(points)" :key="point[0]">
-        {{ point[0] }}: {{ point[1] }}
+      <li class="flex gap-4">
+        <GameCard
+          :typeTitle="'Modo de batalla'"
+          :data="chosenCards.battleMode"
+          @click="draw('battleMode')"
+        >
+          <div>Puntos: {{ chosenCards.battleMode?.points }}</div>
+        </GameCard>
+        <GameCard :typeTitle="'Juego'" :data="chosenCards.game" @click="draw('game')" />
+        <GameCard :typeTitle="'Desafío'" :data="chosenCards.challenge" @click="draw('challenge')" />
       </li>
     </ul>
-    <ul>
-      <li v-for="sel in selections" :key="sel.title">
-        {{ sel.title }}: {{ sel.ref?.title }}
-        <span v-if="sel.name === 'battle-mode' && sel.ref">(points: {{ sel.ref.points }})</span>
-      </li>
-    </ul>
-    <div v-if="canChooseWinner">
-      <button type="button" @click="chooseWinner('a')">A wins</button>
-      <button type="button" @click="chooseWinner('b')">B wins</button>
-    </div>
-    <button v-else type="button" @click="draw">Draw {{ selection.title.toLowerCase() }}</button>
-  </div>
+  </main>
 </template>
+
+<style module>
+.btn {
+  @apply px-4 py-2 rounded-md text-white;
+
+  &:disabled {
+    @apply bg-gray-300 cursor-not-allowed;
+  }
+}
+
+.input {
+  @apply border border-gray-300 rounded-md px-4 py-2 w-20;
+}
+</style>
