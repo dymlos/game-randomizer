@@ -25,7 +25,9 @@ defineEmits<{
         class="flex flex-col gap-2 items-center justify-center h-full rounded-xl bg-violet-100 border border-violet-200 p-4 shadow-lg overflow-y-auto"
         :class="$style.cardInfo"
       >
-        <h2 class="text-xl">{{ data.title }}</h2>
+        <button type="button" @click="$emit('click')">
+          <h2 class="text-xl">{{ data.title }}</h2>
+        </button>
         <p v-if="'description' in data">
           {{ data.description }}
         </p>

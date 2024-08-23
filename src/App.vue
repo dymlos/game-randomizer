@@ -43,7 +43,8 @@ const canChooseWinner = computed(() =>
 )
 
 const draw = (deck: keyof typeof decks) => {
-  const cards = decks[deck]
+  const cards =
+    deck === 'challenge' ? decks.challenge.flatMap((c) => new Array(c.weight).fill(c)) : decks[deck]
   const randomIndex = Math.floor(Math.random() * cards.length)
   chosenCards[deck] = cards[randomIndex] as any
 }

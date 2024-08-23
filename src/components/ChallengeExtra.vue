@@ -4,11 +4,12 @@ import {
   boplBattleItems,
   mysticStrifeCharacters,
   rivalsOfAetherCharacters,
+  wanbaWarriorsCharacters,
   type Challenge,
   type Game,
 } from '@/data'
-import { getRandomItem, getRandomItemNumber, getRandomItems } from '@/utils'
-import { ref, watchEffect } from 'vue'
+import { getRandomItemNumber, getRandomItems } from '@/utils'
+import { ref, watch, watchEffect } from 'vue'
 
 const props = defineProps<{
   challenge: Challenge
@@ -16,6 +17,20 @@ const props = defineProps<{
 }>()
 
 const extra = ref<string[]>()
+
+watch(
+  () => props.challenge,
+  () => {
+    extra.value = undefined
+  },
+)
+
+watch(
+  () => props.game,
+  () => {
+    extra.value = undefined
+  },
+)
 
 watchEffect(() => {
   if (extra.value || !props.game) return
@@ -40,12 +55,15 @@ function getChallengeExtra(challenge: Challenge, game: Game): string[] {
       break
     }
     case 'mirror-war': {
-      // 'mystic-strife', 'rivals-of-aether'
       switch (game.name) {
         case 'mystic-strife':
           return getRandomItems(mysticStrifeCharacters, 1)
         case 'rivals-of-aether':
           return getRandomItems(rivalsOfAetherCharacters, 1)
+        case 'wanba-warrior':
+          return getRandomItems(wanbaWarriorsCharacters, 2)
+        case 'bopl-battle':
+          return getRandomItems(boplBattleItems, 3)
       }
     }
   }

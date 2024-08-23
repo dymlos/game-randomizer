@@ -65,6 +65,7 @@ export const battleModes = [
     description:
       'Cada equipo mandará a uno de sus integrantes para enfrentar a todo el equipo rival',
     points: 10,
+    games: ['boomerang-fu', 'bopl-battle', 'mystic-strife', 'rivals-of-aether'],
   },
 ] as const satisfies {
   name: string
@@ -78,27 +79,37 @@ export type BattleMode = (typeof battleModes)[number] & { games?: Game['name'][]
 
 export const challenges = [
   {
+    name: 'no-challenge',
+    title: 'No Challenge',
+    description: 'No hay desafío',
+    weight: 6,
+  },
+  {
     name: 'unique-item',
     title: 'Unique Item',
     description: 'Se sortearán las habilidades o items que se podrán usar en el juego',
     games: ['boomerang-fu', 'bopl-battle'],
+    weight: 4,
   },
   {
     name: 'good-luck-with-that',
     title: 'Good Luck With That',
     description: 'Se deberá jugar con personajes o skills de forma aleatoria',
     games: ['mystic-strife', 'rivals-of-aether', 'wanba-warrior', 'bopl-battle'],
+    weight: 3,
   },
   {
     name: 'one-hand-mastery',
     title: 'One-Hand Mastery',
     description: 'Se jugará con una sola mano en el joystick',
+    weight: 1,
   },
   {
     name: 'mirror-war',
     title: 'Mirror War',
-    description: 'Todos jugarán con el mismo personaje',
-    games: ['mystic-strife', 'rivals-of-aether', 'wanba-warrior'],
+    description: 'Todos jugarán con el mismo personaje o poderes',
+    games: ['mystic-strife', 'rivals-of-aether', 'wanba-warrior', 'bopl-battle'],
+    weight: 3,
   },
   {
     name: 'sudden-death',
@@ -106,16 +117,19 @@ export const challenges = [
     description:
       'Cada personaje tendrá la vida al máximo de daño desde el inicio. Por ende, al primer golpe podrían morir',
     games: ['rivals-of-aether'],
+    weight: 2,
   },
   {
     name: 'wrong-direction',
     title: 'Wrong Direction',
     description: 'Se jugará con las flechitas del joystick invertidas',
+    weight: 1,
   },
 ] as const satisfies {
   name: string
   title: string
   description: string
+  weight: number
   games?: Game['name'][]
 }[]
 
@@ -244,3 +258,5 @@ export const mysticStrifeCharacters = [
   'Engineer',
   'Dragoon',
 ]
+
+export const wanbaWarriorsCharacters = ['Ding', 'Bing', 'Monkie', 'Scarecrow', 'Greatos', 'Doozi']
