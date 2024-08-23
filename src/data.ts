@@ -57,7 +57,7 @@ export const battleModes = [
     description:
       'Todos los jugadores de cada equipo participan. Si el juego no tiene la posibilidad de jugar en equipo, se hará un todos contra todos pero intentando jugar a favor de tu equipo.',
     points: 10,
-    games: ['boomerang-fu', 'mystic-strife', 'rivals-of-aether', 'bopl-battle'],
+    games: ['boomerang-fu', 'mystic-strife', 'shipped', 'rivals-of-aether', 'bopl-battle'],
   },
   {
     name: 'survival',
@@ -65,7 +65,7 @@ export const battleModes = [
     description:
       'Cada equipo mandará a uno de sus integrantes para enfrentar a todo el equipo rival',
     points: 10,
-    games: ['boomerang-fu', 'bopl-battle', 'mystic-strife', 'rivals-of-aether'],
+    games: ['boomerang-fu', 'mystic-strife', 'rivals-of-aether', 'bopl-battle'],
   },
 ] as const satisfies {
   name: string
@@ -82,7 +82,7 @@ export const challenges = [
     name: 'no-challenge',
     title: 'No Challenge',
     description: 'No hay desafío',
-    weight: 6,
+    weight: 4,
   },
   {
     name: 'unique-item',
