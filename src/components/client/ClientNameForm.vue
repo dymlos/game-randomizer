@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import type { Room } from 'trystero'
-import { computed, ref } from 'vue'
-
-const props = defineProps<{ room: Room; hostId: string }>()
+import { useActionState } from '@/store/actionState'
+import { useLocalStorage } from '@vueuse/core'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import { ref } from 'vue'
 
 const emit = defineEmits<{ submit: [name: string] }>()
 
-const peerName = ref('')
+const actionState = useActionState()
+
+const peerName = useLocalStorage<string | undefined>('gameRandomizer.peerName', undefined, {
+  writeDefaults: false,
+})
 const loading = ref(false)
 
-const sendPeerName = computed(() => props.room.makeAction<string>('peerName')[0])
-
 async function submit() {
+  if (!peerName.value) return
   loading.value = true
   try {
-    await sendPeerName.value(peerName.value, props.hostId)
+    await actionState.set('peer:name', peerName.value)
     emit('submit', peerName.value)
   } finally {
     loading.value = false
@@ -23,8 +27,8 @@ async function submit() {
 </script>
 
 <template>
-  <form @submit.prevent="submit">
-    <input type="text" autofocus placeholder="Your name" v-model="peerName" required />
-    <button :disabled="loading">Set Name</button>
+  <form @submit.prevent="submit" class="flex flex-col gap-4 sm:flex-row">
+    <InputText autofocus placeholder="Your name" v-model="peerName" required :disabled="loading" />
+    <Button type="submit" :loading>Set Name</Button>
   </form>
 </template>

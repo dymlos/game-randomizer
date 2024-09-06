@@ -1,70 +1,65 @@
 <script setup lang="ts">
-import type { Room } from 'trystero'
-import { computed, ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import ClientNameForm from './ClientNameForm.vue'
+import { useRoom } from '@/store/room'
+import { useActionState } from '@/store/actionState'
+import Button from 'primevue/button'
 
-const props = defineProps<{
-  roomId: string
-  room: Room
-}>()
+const room = useRoom()
+const actionState = useActionState()
 
-const peerName = ref('')
-const hostId = ref('')
-const lostHostId = ref<string>()
+const peerName = ref<string>()
 
-const getHostId = computed(() => props.room.makeAction<null>('hostId')[1])
-const sendPeerName = computed(() => props.room.makeAction<string>('peerName')[0])
-
-watchEffect(() => {
-  getHostId.value((_, peerId) => {
-    hostId.value = peerId
-    if (peerName.value) {
-      sendPeerName.value(peerName.value, peerId)
-    }
-  })
+room.watch('host:id', (_, id) => {
+  actionState.hostId = id
+  actionState.sendAll()
+  endVote()
 })
 
-watchEffect(() => {
-  props.room.onPeerLeave((peerId) => {
-    if (peerId === hostId.value) {
-      lostHostId.value = peerId
-    }
-  })
+room.onPeerLeave((peerId) => {
+  if (peerId === actionState.hostId) {
+    actionState.hostId = undefined
+  }
 })
 
-const getVoting = props.room.makeAction<string[]>('voting')[1]
-const getEndVoting = props.room.makeAction<null>('endVoting')[1]
-const sendVote = props.room.makeAction<string>('vote')[0]
 const voteList = ref<string[]>()
+const selectedVote = ref<string>()
 
-getVoting((list) => {
+room.watch('voting:start', (list) => {
+  actionState.delete('voting:vote')
   voteList.value = list
+  selectedVote.value = undefined
 })
 
-getEndVoting(() => {
+function endVote() {
+  actionState.delete('voting:vote')
   voteList.value = undefined
+  selectedVote.value = undefined
+}
+
+room.watch('voting:end', () => {
+  endVote()
 })
 
 function vote(vote: string) {
-  sendVote(vote, hostId.value)
+  actionState.set('voting:vote', vote)
+  selectedVote.value = vote
 }
 </script>
 
 <template>
-  <section>
-    <h1>
-      Room {{ roomId }}<span v-if="peerName"> / Player {{ peerName }}</span>
+  <section class="flex w-full max-w-screen-sm flex-col gap-4">
+    <h1 class="text-lg">
+      Room {{ room.id }}<span v-if="peerName"> / Player {{ peerName }}</span>
     </h1>
-    <p v-if="!hostId">Establishing connection...</p>
-    <p v-else-if="hostId === lostHostId">Connection lost</p>
-    <ClientNameForm v-else-if="!peerName" :room :hostId @submit="peerName = $event" />
-    <section v-else-if="voteList">
-      <h2>Vote for the game</h2>
-      <ul>
-        <li v-for="game in voteList" :key="game">
-          <button @click="vote(game)">{{ game }}</button>
-        </li>
-      </ul>
-    </section>
+    <p v-if="!actionState.hostId">Establishing connection...</p>
+    <ClientNameForm v-else-if="!peerName" @submit="peerName = $event" />
+    <ul v-else-if="voteList" class="flex flex-col gap-3">
+      <li v-for="item in voteList" :key="item">
+        <Button @click="vote(item)" :outlined="selectedVote !== item" class="w-full">{{
+          item
+        }}</Button>
+      </li>
+    </ul>
   </section>
 </template>
