@@ -181,8 +181,8 @@ export const games = [
         choose: () => {
           const item = getRandomItem(
             normalizeWeightedArray([
-              ['Only blades', 3],
-              ['Random', 1],
+              ['Only blades', 1],
+              ['Random', 2],
             ]),
           )
           if (item !== 'Random') return item

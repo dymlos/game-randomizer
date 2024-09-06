@@ -87,7 +87,7 @@ function handleSpecialCategories() {
         if (typeof options === 'string') options = [options]
         options = options.filter(Boolean)
         if (!options.length) return ''
-        return options.map((option) => `${challenge.name}: ${option}`)
+        return `${challenge.name}: ${options.join(', ')}`
       })
       .filter(Boolean)
       .join('; ')
