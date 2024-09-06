@@ -40,7 +40,7 @@ const possibleOptions = computed(() =>
 )
 
 const randomChosen = ref<string>()
-const chosen = computed(() => voting.chosen ?? randomChosen.value)
+const chosen = computed(() => randomChosen.value ?? voting.chosen)
 
 function getOptionLabel(option: string | { label: string; value: string }) {
   return typeof option === 'string' ? option : option.label
@@ -61,9 +61,7 @@ watch(
 function handleVoting() {
   if (voting.active) {
     voting.end()
-    if (category.value === 'Games') {
-      challengeGame.value = voting.chosen ?? games[0].name
-    }
+    handleSpecialCategories()
   } else {
     if (!possibleOptions.value.length) return
     randomChosen.value = undefined
@@ -72,10 +70,27 @@ function handleVoting() {
 }
 
 function chooseRandom() {
-  if (!possibleOptions.value.length) return
   randomChosen.value = getRandomItem(possibleOptions.value)
+  voting.chosen = undefined
+  handleSpecialCategories()
+}
+
+function handleSpecialCategories() {
   if (category.value === 'Games') {
-    challengeGame.value = randomChosen.value
+    challengeGame.value = chosen.value ?? games[0].name
+  } else if (category.value === 'Challenges') {
+    const game = games.find((game) => game.name === challengeGame.value)
+    if (!game) throw new Error(`Game ${challengeGame.value} not found`)
+    randomChosen.value = game.challenges
+      .map((challenge) => {
+        let options = challenge.choose()
+        if (typeof options === 'string') options = [options]
+        options = options.filter(Boolean)
+        if (!options.length) return ''
+        return options.map((option) => `${challenge.name}: ${option}`)
+      })
+      .filter(Boolean)
+      .join('; ')
   }
 }
 </script>
@@ -93,7 +108,7 @@ function chooseRandom() {
     <AutoComplete
       v-if="category === 'Custom'"
       v-model="customOptions"
-      class="max-w-md"
+      class="max-w-sm sm:max-w-md"
       :disabled="voting.active"
       multiple
       :typeahead="false"
@@ -102,7 +117,7 @@ function chooseRandom() {
       v-else-if="category !== 'Yes/No' && category !== 'Challenges'"
       v-model="selectedOptions"
       :options="options"
-      class="max-w-md"
+      class="max-w-sm sm:max-w-md"
       :option-label="getOptionLabel"
       :option-value="getOptionValue"
       :disabled="voting.active"

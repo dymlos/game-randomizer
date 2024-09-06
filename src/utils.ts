@@ -26,3 +26,7 @@ export function getRandomItemNumber(arrLength: number): number {
   }
   return number
 }
+
+export function normalizeWeightedArray<T>(arr: [T, number][]): T[] {
+  return arr.flatMap(([item, weight]) => new Array(weight).fill(item))
+}
