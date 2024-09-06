@@ -13,6 +13,10 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@primevue/themes": "^4.0.5",
+    "@vueuse/core": "^11.0.3",
+    "primevue": "^4.0.5",
+    "trystero": "^0.20.0",
     "vue": "^3.4.29"
   },
   "devDependencies": {
