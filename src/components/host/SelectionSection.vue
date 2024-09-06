@@ -24,7 +24,7 @@ const options = computed(() => {
     case 'Games':
       return gameNames
     case 'Players':
-      return peers.list.map((peer) => ({ label: peer.name ?? peer.id, value: peer.id }))
+      return peers.list.map((peer) => peer.name ?? peer.id)
     case 'Challenges':
       return []
     case 'Yes/No':
@@ -42,18 +42,10 @@ const possibleOptions = computed(() =>
 const randomChosen = ref<string>()
 const chosen = computed(() => randomChosen.value ?? voting.chosen)
 
-function getOptionLabel(option: string | { label: string; value: string }) {
-  return typeof option === 'string' ? option : option.label
-}
-
-function getOptionValue(option: string | { label: string; value: string }) {
-  return typeof option === 'string' ? option : option.value
-}
-
 watch(
   category,
   () => {
-    selectedOptions.value = options.value.map(getOptionValue)
+    selectedOptions.value = options.value
   },
   { immediate: true },
 )
@@ -118,8 +110,6 @@ function handleSpecialCategories() {
       v-model="selectedOptions"
       :options="options"
       class="max-w-sm sm:max-w-md"
-      :option-label="getOptionLabel"
-      :option-value="getOptionValue"
       :disabled="voting.active"
     />
     <div class="flex gap-2">

@@ -18,7 +18,7 @@ const roomId = useLocalStorage<undefined | string>('gameRandomizer.roomId', unde
 
 function submit(isHost: boolean) {
   if (!roomId.value) return
-  emit('submit', { roomId: roomId.value, isHost })
+  emit('submit', { roomId: roomId.value.toLocaleLowerCase(), isHost })
 }
 
 function submitJoin() {

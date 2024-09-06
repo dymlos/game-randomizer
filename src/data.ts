@@ -216,7 +216,7 @@ export const games = [
             (item) =>
               `${item}${getRandomItem(
                 normalizeWeightedArray([
-                  ['', 10],
+                  ['', 3],
                   ['+', 1],
                 ]),
               )}`,
