@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 import { type RoomAction, useRoom } from './room'
-import type { TargetPeers } from 'trystero'
+import type { TargetPeers } from 'trystero/firebase'
 
 export type RoomActionMap = Map<keyof RoomAction, RoomAction[keyof RoomAction]>
 

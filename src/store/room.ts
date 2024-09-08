@@ -1,5 +1,7 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { joinRoom, type JsonValue, type Room, type TargetPeers } from 'trystero'
+import type {} from 'trystero'
+// import { joinRoom, type JsonValue, type Room, type TargetPeers } from 'trystero/supabase'
+import { joinRoom, type JsonValue, type Room, type TargetPeers } from 'trystero/firebase'
 import { ref, watch } from 'vue'
 
 export type RoomAction = {
@@ -38,7 +40,12 @@ export const useRoom = defineStore('room', () => {
 
   function join(roomId: string) {
     id.value = roomId
-    instance.value = joinRoom({ appId: 'dymlos-game-randomizer' }, roomId)
+    instance.value = joinRoom(
+      {
+        appId: 'https://game-randomizer-8b597-default-rtdb.firebaseio.com/',
+      },
+      roomId,
+    )
   }
 
   function send<T extends keyof RoomAction>(
